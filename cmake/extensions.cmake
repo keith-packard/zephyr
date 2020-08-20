@@ -1389,7 +1389,10 @@ function(target_ld_options target scope)
     zephyr_check_compiler_flag(C "" ${check})
     set(CMAKE_REQUIRED_FLAGS ${SAVED_CMAKE_REQUIRED_FLAGS})
 
-    target_link_libraries_ifdef(${check} ${target} ${scope} ${option})
+    separate_arguments(options UNIX_COMMAND ${option})
+    foreach(suboption IN LISTS options)
+      target_link_libraries_ifdef(${check} ${target} ${scope} ${suboption})
+    endforeach()
   endforeach()
 endfunction()
 
