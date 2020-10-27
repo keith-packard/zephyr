@@ -29,6 +29,15 @@ config MINIMAL_LIBC
 	help
 	  Build with minimal C library.
 
+config PICOLIBC
+	bool "Picolibc library"
+	select LIBC_ERRNO
+	select THREAD_LOCAL_STORAGE if ARCH_HAS_THREAD_LOCAL_STORAGE
+	depends on !NATIVE_APPLICATION
+	help
+	  Build with picolibc library. The picolibc library is built as
+	  a module in this case
+
 config NEWLIB_LIBC
 	bool "Newlib C library"
 	depends on !NATIVE_APPLICATION
@@ -52,6 +61,12 @@ endchoice # LIBC_IMPLEMENTATION
 
 config HAS_NEWLIB_LIBC_NANO
 	bool
+
+if PICOLIBC
+
+source "lib/libc/picolibc/Kconfig"
+
+endif # PICOLIBC
 
 if NEWLIB_LIBC
 
