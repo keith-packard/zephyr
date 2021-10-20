@@ -189,6 +189,100 @@ int z_impl_zephyr_write_stdout(const void *buffer, int nbytes)
 	return nbytes;
 }
 
+#ifdef CONFIG_PRINTK
+
+#if defined(CONFIG_PRINTK_SYNC)
+static struct k_spinlock lock;
+#endif
+
+static int
+k_chr_out(char c, FILE *file)
+{
+	(void) file;
+	k_str_out(&c, 1);
+	return (int) (unsigned char) c;
+}
+
+__attribute__((weak)) int arch_printk_char_out(int c)
+{
+	(void) c;
+	return 0;
+}
+
+static FILE __console = FDEV_SETUP_STREAM(
+	(int(*)(char, FILE *)) arch_printk_char_out,
+	NULL, NULL, _FDEV_SETUP_WRITE);
+
+static FILE __k_out = FDEV_SETUP_STREAM(
+	k_chr_out,
+	NULL, NULL, _FDEV_SETUP_WRITE);
+
+#ifdef CONFIG_USERSPACE
+static inline void z_vrfy_k_str_out(char *c, size_t n)
+{
+	Z_OOPS(Z_SYSCALL_MEMORY_READ(c, n));
+	z_impl_k_str_out((char *)c, n);
+}
+#include <syscalls/k_str_out_mrsh.c>
+#endif /* CONFIG_USERSPACE */
+
+void __printk_hook_install(int (*fn)(int))
+{
+	__console.put = (int(*)(char, FILE *)) fn;
+	__console.flags |= _FDEV_SETUP_WRITE;
+}
+
+void *__printk_get_hook(void)
+{
+	return __console.put;
+}
+
+void vprintk(const char *fmt, va_list ap)
+{
+	if (IS_ENABLED(CONFIG_LOG_PRINTK)) {
+		z_log_vprintk(fmt, ap);
+		return;
+	}
+
+	if (k_is_user_context()) {
+		vfprintf(&__k_out, fmt, ap);
+	} else {
+#ifdef CONFIG_PRINTK_SYNC
+		k_spinlock_key_t key = k_spin_lock(&lock);
+#endif
+
+		vfprintf(&__console, fmt, ap);
+
+#ifdef CONFIG_PRINTK_SYNC
+		k_spin_unlock(&lock, key);
+#endif
+	}
+}
+
+void printk(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	vprintk(fmt, ap);
+	va_end(ap);
+}
+
+void z_impl_k_str_out(char *c, size_t n)
+{
+#ifdef CONFIG_PRINTK_SYNC
+	k_spinlock_key_t key = k_spin_lock(&lock);
+#endif
+
+	(void) fwrite(c, 1, n, &__console);
+
+#ifdef CONFIG_PRINTK_SYNC
+	k_spin_unlock(&lock, key);
+#endif
+}
+
+#endif
+
 #ifndef CONFIG_POSIX_API
 int _read(int fd, char *buf, int nbytes)
 {
