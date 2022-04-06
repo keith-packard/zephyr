@@ -26,3 +26,13 @@ tests:
     tags: libc
     testcases:
     - EOF
+  libraries.picolibc.sprintf:
+    extra_args: CONF_FILE=prj_picolibc.conf
+    tags: clib ignore_faults picolibc
+    platform_exclude: native_posix native_posix_64 nrf52_bsim
+    arch_allow: arm riscv32 riscv64
+  libraries.picolibc.sprintf_new:
+    extra_args: CONF_FILE=prj_picolibc_new.conf
+    platform_exclude: native_posix native_posix_64 nrf52_bsim
+    tags: picolibc
+    arch_allow: arm riscv32 riscv64

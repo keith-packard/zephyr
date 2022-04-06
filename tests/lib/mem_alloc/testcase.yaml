@@ -50,3 +50,9 @@ tests:
     - malloc
     - memalloc_max
     - reallocarray
+  libraries.libc.picolibc:
+    extra_args: CONF_FILE=prj_picolibc.conf
+    arch_exclude: posix
+    arch_allow: arm riscv32 riscv64
+    platform_exclude: twr_ke18f native_posix_64 nrf52_bsim
+    tags: clib picolibc userspace
