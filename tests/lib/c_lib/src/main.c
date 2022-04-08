@@ -32,6 +32,9 @@
 #include <ctype.h>
 #include <time.h>
 #include <ztest_error_hook.h>
+#ifdef CONFIG_PICOLIBC
+#include <unistd.h>
+#endif
 
 #define STACK_SIZE (512 + CONFIG_TEST_EXTRA_STACK_SIZE)
 #define LIST_LEN 2
@@ -1065,11 +1068,13 @@ ZTEST(test_c_lib, test_time)
  */
 ZTEST(test_c_lib, test_rand)
 {
+#ifndef CONFIG_PICOLIBC
 	int a;
 
 	a = rand();
 	/* The default seed is 1 */
 	zassert_equal(a, 1103527590, "rand failed");
+#endif
 }
 
 /**
@@ -1079,6 +1084,7 @@ ZTEST(test_c_lib, test_rand)
  */
 ZTEST(test_c_lib, test_srand)
 {
+#ifndef CONFIG_PICOLIBC
 	int a;
 
 	srand(0);
@@ -1100,6 +1106,7 @@ ZTEST(test_c_lib, test_srand)
 	srand(UINT_MAX);
 	a = rand();
 	zassert_equal(a, 1043980748, "srand with seed UINT_MAX failed");
+#endif
 }
 
 /**
@@ -1109,6 +1116,7 @@ ZTEST(test_c_lib, test_srand)
  */
 ZTEST(test_c_lib, test_rand_reproducibility)
 {
+#ifndef CONFIG_PICOLIBC
 	int a;
 	int b;
 	int c;
@@ -1162,6 +1170,7 @@ ZTEST(test_c_lib, test_rand_reproducibility)
 	srand(UINT_MAX);
 	c = rand();
 	zassert_equal(c, 1043980748, "srand with seed UINT_MAX failed (3rd)");
+#endif
 }
 
 /**
