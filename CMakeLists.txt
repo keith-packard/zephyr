@@ -164,11 +164,19 @@ zephyr_compile_options($<$<COMPILE_LANGUAGE:CXX>:$<TARGET_PROPERTY:compiler-cpp,
 #  choices. Toolchains set both of the security_fortify_{compile_time,run_time}
 #  properties and the Kconfig settings are used here to select between those.
 #
+get_property(FORTIFY_SOURCE_COMPILE_TIME_FLAG TARGET compiler PROPERTY security_fortify_compile_time)
+get_property(FORTIFY_SOURCE_RUN_TIME_FLAG TARGET compiler PROPERTY security_fortify_run_time)
+
 if(CONFIG_FORTIFY_SOURCE_COMPILE_TIME)
-  zephyr_compile_definitions($<TARGET_PROPERTY:compiler,security_fortify_compile_time> )
-endif()
-if(CONFIG_FORTIFY_SOURCE_RUN_TIME)
-  zephyr_compile_definitions($<TARGET_PROPERTY:compiler,security_fortify_run_time> )
+  if("${FORTIFY_SOURCE_COMPILE_TIME_FLAG}" STREQUAL "")
+    message(FATAL_ERROR "Compiler does not support compile-time buffer overflow detection")
+  endif()
+  zephyr_compile_definitions(${FORTIFY_SOURCE_COMPILE_TIME_FLAG})
+elseif(CONFIG_FORTIFY_SOURCE_RUN_TIME)
+  if("${FORTIFY_SOURCE_RUN_TIME_FLAG STREQUAL}" "")
+    message(FATAL_ERROR "Compiler does not support run-time buffer overflow detection")
+  endif()
+  zephyr_compile_definitions(${FORTIFY_SOURCE_RUN_TIME_FLAG})
 endif()
 
 # @Intent: Set compiler flags to detect general stack overflows across all functions
