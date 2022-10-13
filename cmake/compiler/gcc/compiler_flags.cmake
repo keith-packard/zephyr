@@ -111,6 +111,12 @@ if (NOT CONFIG_NEWLIB_LIBC AND
   set_compiler_property(APPEND PROPERTY nostdinc_include ${NOSTDINC})
 endif()
 
+if (CONFIG_PICOLIBC AND
+    NOT CONFIG_PICOLIBC_IO_FLOAT)
+  set_compiler_property(PROPERTY no_printf_return_value -fno-printf-return-value)
+  get_property(tmp TARGET compiler PROPERTY no_printf_return_value)
+endif()
+
 set_compiler_property(TARGET compiler-cpp PROPERTY nostdincxx "-nostdinc++")
 
 # Required C++ flags when using gcc

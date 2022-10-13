@@ -273,6 +273,9 @@ if(NOT CONFIG_PICOLIBC)
   # @Intent: Set compiler specific flag for bare metal freestanding option
   zephyr_compile_options($<$<COMPILE_LANGUAGE:C>:$<TARGET_PROPERTY:compiler,freestanding>>)
   zephyr_compile_options($<$<COMPILE_LANGUAGE:ASM>:$<TARGET_PROPERTY:compiler,freestanding>>)
+else()
+  # @Intent: Set compiler specific flag to disable printf-related optimizations
+  zephyr_compile_options($<$<COMPILE_LANGUAGE:C>:$<TARGET_PROPERTY:compiler,no_printf_return_value>>)
 endif()
 
 # @Intent: Set compiler specific flag for tentative definitions, no-common
