@@ -4,6 +4,7 @@
 
 add_library(host_mocks STATIC
             host_mocks/assert.c
+            host_mocks/fff.c
             host_mocks/print_utils.c
 )
 

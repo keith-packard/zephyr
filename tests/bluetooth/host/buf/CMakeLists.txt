@@ -3,6 +3,7 @@
 #
 
 add_library(mocks STATIC
+            mocks/fff.c
             mocks/net_buf.c
             mocks/iso.c
             mocks/hci_core.c

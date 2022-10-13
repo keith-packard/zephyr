@@ -3,6 +3,7 @@
 #
 
 add_library(mocks STATIC
+            mocks/fff.c
             mocks/id.c
             mocks/rpa.c
             mocks/conn.c
