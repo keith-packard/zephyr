@@ -1,6 +1,7 @@
 common:
   tags: cbprintf
   type: unit
+  filter: not CONFIG_PICOLIBC
 
 tests:
   utilities.prf.m32v00: # REDUCED
