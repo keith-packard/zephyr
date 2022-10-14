@@ -143,7 +143,7 @@ tests:
       - CONFIG_FPU=y
       - CONFIG_PICOLIBC=y
 
-  libraries.cbprintf_package_long_double_align_offset:
+  libraries.cbprintf_package_long_double_align_offset_picolibc:
     filter: CONFIG_CPU_HAS_FPU
     filter: CONFIG_PICOLIBC_SUPPORTED
     tags: picolibc
