@@ -65,6 +65,7 @@ extern void z_x86_thread_entry_wrapper(k_thread_entry_t entry,
 
 #ifdef CONFIG_THREAD_LOCAL_STORAGE
 extern void z_x86_tls_update_gdt(struct k_thread *thread);
+extern void z_x86_set_tls(struct k_thread *thread);
 #endif
 
 #ifdef __cplusplus

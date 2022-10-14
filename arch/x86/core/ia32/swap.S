@@ -22,6 +22,7 @@
 	GTEXT(arch_swap)
 	GTEXT(z_x86_thread_entry_wrapper)
 	GTEXT(_x86_user_thread_entry_wrapper)
+	GTEXT(z_x86_set_tls)
 
 	/* externs */
 #if !defined(CONFIG_X86_KPTI) && defined(CONFIG_X86_USERSPACE)
@@ -404,3 +405,42 @@ SECTION_FUNC(PINNED_TEXT, z_x86_thread_entry_wrapper)
 	movl	$0, (%esp)
 	jmp	*%edi
 #endif /* _THREAD_WRAPPER_REQUIRED */
+
+#if defined(CONFIG_THREAD_LOCAL_STORAGE)
+/**
+ *
+ * @brief Set thread local storage pointer from thread
+ *
+ * This function is called from arch_switch_to_main_thread to
+ * set up the GS GDT entry for the current stack. We need a custom
+ * function for this path to make sure TLS storage is available
+ * in the main thread as it is normally only set in thread switching
+ *
+ * @param k_thread Pointer to the k_thread
+ *
+ * @return this routine does not return any value
+ */
+SECTION_FUNC(PINNED_TEXT, z_x86_set_tls)
+	/* Setup stack frame, save regs */
+	pushl	%ebp
+	mov	%esp,%ebp
+	pushl	%ebx
+	pushl	%eax
+
+	/* Update TLS GDT entry */
+	mov	0x8(%ebp),%ebx
+	pushl	%ebx
+	call	z_x86_tls_update_gdt
+	addl	$0x4,%esp
+
+	/* Since segment descriptor has changed, need to reload */
+	movw	$GS_TLS_SEG, %ax
+	movw	%ax, %gs
+
+	/* Restore regs */
+	popl	%eax
+	popl	%ebx
+	popl	%ebp
+
+	ret
+#endif

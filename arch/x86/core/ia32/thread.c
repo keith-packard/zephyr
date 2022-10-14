@@ -129,3 +129,16 @@ void arch_new_thread(struct k_thread *thread, k_thread_stack_t *stack,
 #endif /* CONFIG_X86_SSE */
 #endif /* CONFIG_EAGER_FPU_SHARING */
 }
+
+#if CONFIG_ARCH_HAS_CUSTOM_SWAP_TO_MAIN
+__boot_func
+void FUNC_NORETURN arch_switch_to_main_thread(struct k_thread *main_thread, char *stack_ptr,
+				k_thread_entry_t _main)
+{
+	ARG_UNUSED(stack_ptr);
+	z_x86_set_tls(main_thread);
+	z_tls_current = main_thread;
+	z_swap_unlocked();
+	CODE_UNREACHABLE; /* LCOV_EXCL_LINE */
+}
+#endif
