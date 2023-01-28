@@ -22,11 +22,7 @@ from colorama import Fore
 from domains import Domains
 from twisterlib.cmakecache import CMakeCache
 from twisterlib.environment import canonical_zephyr_base
-
-# Job server only works on Linux for now.
-if sys.platform == 'linux':
-    from twisterlib.jobserver import GNUMakeJobClient, GNUMakeJobServer, JobClient
-
+from twisterlib.jobserver import GNUMakeJobClient, GNUMakeJobServer, JobClient
 from twisterlib.log_helper import log_command
 from twisterlib.testinstance import TestInstance
 
@@ -234,11 +230,7 @@ class CMake:
         if self.cwd:
             kwargs['cwd'] = self.cwd
 
-        if sys.platform == 'linux':
-            p = self.jobserver.popen(cmd, **kwargs)
-        else:
-            p = subprocess.Popen(cmd, **kwargs)
-
+        p = self.jobserver.popen(cmd, **kwargs)
         out, _ = p.communicate()
 
         results = {}
@@ -339,10 +331,7 @@ class CMake:
         if self.cwd:
             kwargs['cwd'] = self.cwd
 
-        if sys.platform == 'linux':
-            p = self.jobserver.popen(cmd, **kwargs)
-        else:
-            p = subprocess.Popen(cmd, **kwargs)
+        p = self.jobserver.popen(cmd, **kwargs)
         out, _ = p.communicate()
 
         if p.returncode == 0:
@@ -467,7 +456,7 @@ class FilterBuilder(CMake):
 class ProjectBuilder(FilterBuilder):
 
     def __init__(self, instance, env, jobserver, **kwargs):
-        super().__init__(instance.testsuite, instance.platform, instance.testsuite.source_dir, instance.build_dir, jobserver=None)
+        super().__init__(instance.testsuite, instance.platform, instance.testsuite.source_dir, instance.build_dir, jobserver)
 
         self.log = "build.log"
         self.instance = instance
@@ -926,19 +915,16 @@ class TwisterRunner:
             self.jobs = multiprocessing.cpu_count() * 2
         else:
             self.jobs = multiprocessing.cpu_count()
-
-        if sys.platform == "linux":
-            if os.name == 'posix':
-                self.jobserver = GNUMakeJobClient.from_environ(jobs=self.options.jobs)
-                if not self.jobserver:
-                    self.jobserver = GNUMakeJobServer(self.jobs)
-                elif self.jobserver.jobs:
-                    self.jobs = self.jobserver.jobs
-            # TODO: Implement this on windows/mac also
-            else:
-                self.jobserver = JobClient()
-
-            logger.info("JOBS: %d", self.jobs)
+        if os.name == "posix":
+            self.jobserver = GNUMakeJobClient.from_environ(jobs=self.options.jobs)
+            if not self.jobserver:
+                self.jobserver = GNUMakeJobServer(self.jobs)
+            elif self.jobserver.jobs:
+                self.jobs = self.jobserver.jobs
+        # TODO: Implement this on windows also
+        else:
+            self.jobserver = JobClient()
+        logger.info("JOBS: %d", self.jobs)
 
         self.update_counting_before_pipeline()
 
@@ -1032,21 +1018,7 @@ class TwisterRunner:
                     pipeline.put({"op": "cmake", "test": instance})
 
     def pipeline_mgr(self, pipeline, done_queue, lock, results):
-        if sys.platform == 'linux':
-            with self.jobserver.get_job():
-                while True:
-                    try:
-                        task = pipeline.get_nowait()
-                    except queue.Empty:
-                        break
-                    else:
-                        instance = task['test']
-                        pb = ProjectBuilder(instance, self.env, self.jobserver)
-                        pb.duts = self.duts
-                        pb.process(pipeline, done_queue, task, lock, results)
-
-                return True
-        else:
+        with self.jobserver.get_job():
             while True:
                 try:
                     task = pipeline.get_nowait()
@@ -1057,6 +1029,7 @@ class TwisterRunner:
                     pb = ProjectBuilder(instance, self.env, self.jobserver)
                     pb.duts = self.duts
                     pb.process(pipeline, done_queue, task, lock, results)
+
             return True
 
     def execute(self, pipeline, done):
