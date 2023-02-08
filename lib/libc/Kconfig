@@ -10,6 +10,13 @@ config FULL_LIBC
 	  Select a C library implementation that provides a complete C library
 	  implementation, rather than the subset provided by MINIMAL_LIBC.
 
+config FULL_LIBC_SUPPORTED
+	def_bool y
+	depends on NATIVE_APPLICATION || NEWLIB_LIBC_SUPPORTED
+	help
+	  Selected when the target has support for some full C library that
+	  will be selected when FULL_LIBC is set
+
 config MINIMAL_LIBC_SUPPORTED
 	bool
 	default y
