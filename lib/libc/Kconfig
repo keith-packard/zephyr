@@ -13,7 +13,7 @@ config REQUIRES_FULL_LIBC
 
 config SUPPORT_FULL_LIBC
 	bool
-	depends on NATIVE_APPLICATION || TOOLCHAIN_HAS_NEWLIB
+	depends on NATIVE_APPLICATION || PICOLIBC_SUPPORTED || TOOLCHAIN_HAS_NEWLIB
 	help
 	  Helper symbol to indicate that there is at least one full C library
 	  implementation available on the platform. Used to filter tests which
@@ -38,6 +38,7 @@ choice LIBC_IMPLEMENTATION
 	prompt "C Library Implementation"
 	default EXTERNAL_LIBC if NATIVE_APPLICATION
 	default NEWLIB_LIBC if REQUIRES_FULL_LIBC
+	default PICOLIBC if REQUIRES_FULL_LIBC
 	default MINIMAL_LIBC
 
 config MINIMAL_LIBC
