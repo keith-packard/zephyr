@@ -11,6 +11,14 @@ config REQUIRES_FULL_LIBC
 	  Helper symbol to indicate some feature requires a C library implementation
 	  with more functionality than what MINIMAL_LIBC provides
 
+config SUPPORT_FULL_LIBC
+	bool
+	depends on NATIVE_APPLICATION || TOOLCHAIN_HAS_NEWLIB
+	help
+	  Helper symbol to indicate that there is at least one full C library
+	  implementation available on the platform. Used to filter tests which
+	  require this.
+
 config SUPPORT_MINIMAL_LIBC
 	bool
 	default y
