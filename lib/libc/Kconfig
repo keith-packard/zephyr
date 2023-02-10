@@ -3,11 +3,12 @@
 # Copyright (c) 2016 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-config REQUIRES_FULL_LIBC
+config FULL_LIBC
+	prompt "Require complete C library"
 	bool
 	help
-	  Helper symbol to indicate some feature requires a C library implementation
-	  with more functionality than what MINIMAL_LIBC provides
+	  Select a C library implementation that provides a complete C library
+	  implementation, rather than the subset provided by MINIMAL_LIBC.
 
 config SUPPORT_MINIMAL_LIBC
 	bool
@@ -24,18 +25,24 @@ config PICOLIBC_SUPPORTED
 	help
 	  Selected when the target has support for picolibc.
 
+config REQUIRES_FULL_LIBC
+	bool
+	select FULL_LIBC
+	help
+	  Legacy symbol that selects FULL_LIBC
+
 menu "C Library"
 
 choice LIBC_IMPLEMENTATION
 	prompt "C Library Implementation"
 	default EXTERNAL_LIBC if NATIVE_APPLICATION
-	default NEWLIB_LIBC if REQUIRES_FULL_LIBC
+	default NEWLIB_LIBC if FULL_LIBC
 	default MINIMAL_LIBC
 
 config MINIMAL_LIBC
 	bool "Minimal C library"
 	depends on !NATIVE_APPLICATION
-	depends on !REQUIRES_FULL_LIBC
+	depends on !FULL_LIBC
 	depends on SUPPORT_MINIMAL_LIBC
 	imply COMPILER_FREESTANDING
 	help
