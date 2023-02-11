@@ -58,7 +58,7 @@ endchoice
 
 config REQUIRES_FULL_LIBCPP
 	bool
-	select REQUIRES_FULL_LIBC
+	select FULL_LIBC
 	help
 	  Helper symbol to indicate that a full C++ standard library
 	  implementation is required.
