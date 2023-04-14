@@ -14,7 +14,7 @@ config CPLUSPLUS
 
 config LIB_CPLUSPLUS
 	bool "[DEPRECATED] Link with STD C++ library"
-	select REQUIRES_FULL_LIBC
+	select FULL_LIBC
 	select REQUIRES_FULL_LIBCPP
 	select DEPRECATED
 	help

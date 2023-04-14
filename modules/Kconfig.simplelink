@@ -12,7 +12,7 @@ config SIMPLELINK_HOST_DRIVER
 	bool "Build the SimpleLink WiFi Host Driver"
 	depends on HAS_CC3220SDK
 	depends on MULTITHREADING
-	select REQUIRES_FULL_LIBC
+	select FULL_LIBC
 	select ERRNO
 	select PTHREAD_IPC
 	select POSIX_CLOCK
