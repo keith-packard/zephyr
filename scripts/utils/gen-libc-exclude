@@ -1,0 +1,39 @@
+#!/bin/bash
+
+HERE=`dirname "$0"`
+
+if [ -z "$ZEPHYR_SDK_INSTALL_DIR" ]; then
+    echo 'Must define ZEPHYR_SDK_INSTALL_DIR' 1>&2
+    exit 1
+fi
+
+if [ -z "$ZEPHYR_BASE" ]; then
+    echo 'Must define ZEPHYR_BASE' 1>&2
+    exit 1
+fi
+
+gen_syms() {
+    while read i; do
+	spatch --macro-file "$HERE"/libc-macros.h -sp-file "$HERE"/find_id.cocci "$i" 2>/dev/null |
+	    awk '/identifier/ { if ($2 !~ "_.*") print $2; }'
+	grep '^[ \t]*#[ \t]*\(define\|undef\)[ \t][ \t]*[A-Za-z]' "$i" |
+	    sed 's/^[ \t]*#[ \t]*\(define\|undef\)[ \t][ \t]*\([_A-Za-z][_A-Za-z0-9]*\).*$/\1 \2/' |
+	    awk '{ if ($1 == "define") defs[$2] = 1; else defs[$2] = 0; } END { for (id in defs) if (defs[id]) print id; }'
+    done | (LANG=C sort -u)
+}
+
+TMPDIR=`mktemp -d $PWD/gen-libc.XXXXXXXX`
+trap "rm -r $TMPDIR" EXIT
+
+MINIMAL_LIBC_INCLUDE="$ZEPHYR_BASE"/lib/libc/minimal/include
+POSIX_INCLUDE="$ZEPHYR_BASE"/include/zephyr/posix
+MINIMAL_LIBC_SYMS="$TMPDIR"/minimal-names
+
+find "$MINIMAL_LIBC_INCLUDE" "$POSIX_INCLUDE" -type f | gen_syms > "$MINIMAL_LIBC_SYMS"
+
+PICOLIBC_INCLUDE="$ZEPHYR_SDK_INSTALL_DIR"/arm-zephyr-eabi/picolibc/include
+PICOLIBC_LIBC_SYMS="$TMPDIR"/picolibc-names
+
+find "$PICOLIBC_INCLUDE" -type f | gen_syms > "$PICOLIBC_LIBC_SYMS"
+
+LANG=C comm -23 "$PICOLIBC_LIBC_SYMS" "$MINIMAL_LIBC_SYMS"
