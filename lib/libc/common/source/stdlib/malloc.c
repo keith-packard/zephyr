@@ -164,7 +164,7 @@ void *aligned_alloc(size_t alignment, size_t size)
  * Note that aligned_alloc isn't defined to work as a replacement for
  * memalign as it requires that the size be a multiple of the alignment,
  * while memalign does not. However, the aligned_alloc implementation here
- * is just a wrapper around sys_heap_aligned_alloc which doen't have that
+ * is just a wrapper around sys_heap_aligned_alloc which doesn't have that
  * requirement and so can be used by memalign.
  */
 
