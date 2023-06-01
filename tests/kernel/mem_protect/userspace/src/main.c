@@ -1020,18 +1020,42 @@ K_APP_BMEM(default_part) volatile bool kernel_only_thread_ran;
 K_APP_BMEM(default_part) volatile bool kernel_only_thread_user_ran;
 static K_SEM_DEFINE(kernel_only_thread_run_sem, 0, 1);
 
+static void
+init_stack(void);
+
+static void
+check_stack(const char *);
+
 void kernel_only_thread_user_entry(void *p1, void *p2, void *p3)
 {
+	check_stack("user entry");
+
 	printk("kernel only thread in user mode\n");
+
+	check_stack("user printk");
 
 	kernel_only_thread_user_ran = true;
 }
 
 void kernel_only_thread_entry(void *p1, void *p2, void *p3)
 {
+	init_stack();
+
+	check_stack("function top");
+
 	k_sem_take(&kernel_only_thread_run_sem, K_FOREVER);
 
+	check_stack("after sem_take");
+	check_stack("after check_stack");
+
+	printf("printf %p\n", p1);
+
+	check_stack("after printf");
+
 	printk("kernel only thread in kernel mode\n");
+
+	check_stack("after printk");
+	check_stack("after check_stack");
 
 	/* Some architectures emit kernel OOPS instead of panic. */
 #if defined(CONFIG_ARM64)
@@ -1040,9 +1064,13 @@ void kernel_only_thread_entry(void *p1, void *p2, void *p3)
 	set_fault(K_ERR_KERNEL_PANIC);
 #endif
 
+	check_stack("after set_fault");
+
 	kernel_only_thread_ran = true;
 
 	k_thread_user_mode_enter(kernel_only_thread_user_entry, NULL, NULL, NULL);
+
+	check_stack("after user_mode_enter");
 }
 
 #ifdef CONFIG_MMU
@@ -1055,6 +1083,40 @@ static K_KERNEL_THREAD_DEFINE(kernel_only_thread,
 			      KERNEL_ONLY_THREAD_STACK_SIZE,
 			      kernel_only_thread_entry, NULL, NULL, NULL,
 			      0, 0, 0);
+
+static volatile uintptr_t sp = (uintptr_t) _k_thread_stack_kernel_only_thread;
+static volatile int fill_point;
+
+static void
+init_stack(void)
+{
+	uint32_t	*fill_stack = (uint32_t *) sp;
+	uint32_t	*rsp;
+	unsigned i;
+
+	__asm__("mv %0, sp" : "=r" (rsp));
+
+	for (i = 0; &fill_stack[i+1] < rsp; i++)
+		fill_stack[i] = 0xbaadf00d;
+	fill_point = i;
+}
+
+static void
+check_stack(const char *where)
+{
+	uint32_t	*fill_stack = (uint32_t *) sp;
+	unsigned i;
+
+	for (i = 0; i < fill_point; i++)
+		if (fill_stack[i] != 0xbaadf00d) {
+			printf("CHECK %s: stack used to %d (value 0x%08lx) (limit %d)\n",
+			       where, KERNEL_ONLY_THREAD_STACK_SIZE - i*4, (unsigned long) fill_stack[i], KERNEL_ONLY_THREAD_STACK_SIZE - fill_point * 4);
+			init_stack();
+			return;
+		}
+	printf("CHECK %s: stack unused (limit %d)\n", where, KERNEL_ONLY_THREAD_STACK_SIZE - fill_point * 4);
+	init_stack();
+}
 
 ZTEST(userspace, test_kernel_only_thread)
 {
