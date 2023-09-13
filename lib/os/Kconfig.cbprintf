@@ -67,7 +67,6 @@ config CBPRINTF_FP_SUPPORT
 	bool "Floating point formatting in cbprintf"
 	default y if FPU
 	depends on CBPRINTF_COMPLETE
-	select PICOLIBC_IO_FLOAT if PICOLIBC
 	help
 	  Build the cbprintf utility function with support for floating
 	  point format specifiers.  Selecting this increases stack size

@@ -31,10 +31,34 @@ config PICOLIBC_IO_LONG_LONG
 	  Includes support for long long in integer-only printf/scanf. long long
 	  types are always supported in the floating-point versions.
 
-config PICOLIBC_IO_FLOAT
-	bool "support for floating point values in printf/scanf"
+choice PICOLIBC_IO_LEVEL
+	prompt "Picolibc printf/scanf level"
+	default PICOLIBC_IO_MINIMAL if CBPRINTF_NANO
+	default PICOLIBC_IO_INTEGER
 	help
-	  Include floating point support in printf/scanf functions.
+	  Selects the level of printf and scanf support
+
+config PICOLIBC_IO_FLOAT
+	bool "full support for integer/floating point values in printf/scanf"
+	help
+	  Include full floating point and integer support in printf/scanf
+	  functions.
+
+config PICOLIBC_IO_INTEGER
+	bool "full support for integer values in printf/scanf"
+	depends on !CBPRINTF_FP_SUPPORT
+	help
+	  Include full integer, but no floating point support in
+	  printf/scanf.
+
+config PICOLIBC_IO_MINIMAL
+	bool "limited support for integer values in printf/scanf"
+	depends on !CBPRINTF_FP_SUPPORT
+	help
+	  Include limited integer and no floating point suppor tin
+	  printf/scanf.
+
+endchoice
 
 if PICOLIBC_USE_MODULE
 
@@ -95,6 +119,7 @@ config PICOLIBC_ASSERT_VERBOSE
 config PICOLIBC_IO_C99_FORMATS
 	bool "support C99 format additions in printf/scanf"
 	default y
+	depends on !PICOLIBC_IO_MINIMAL
 	help
 	  Includes support for hex floats (in floating-point version) and j, z,
 	  t size modifiers.
@@ -102,7 +127,7 @@ config PICOLIBC_IO_C99_FORMATS
 config PICOLIBC_IO_POS_ARGS
 	bool "Support POSIX positional args (e.g. %$1d) in printf/scanf"
 	default y
-	depends on !PICOLIBC_IO_FLOAT
+	depends on PICOLIBC_IO_INTEGER
 	help
 	  Includes support for positional args (e.g. $1) in integer-only printf
 	  and scanf. Positional args are always supported in the floating-point
@@ -115,6 +140,14 @@ config PICOLIBC_IO_FLOAT_EXACT
 	  Uses Ryu algorithm for exact binary/decimal float conversions.
 	  This ensures that printf values with enough digits can be
 	  fed to scanf and generate exactly the same binary value.
+
+config PICOLIBC_IO_SMALL_ULTOA
+	bool "avoid soft division in printf"
+	default y if PICOLIBC_IO_MINIMAL
+	help
+	  Replaces division and modulus by 10 with shifts and adds when
+	  doing binary to decimal conversion in printf for targets with
+	  no hardware divider.
 
 config PICOLIBC_LOCALE_INFO
 	bool "support locales in libc functions"
