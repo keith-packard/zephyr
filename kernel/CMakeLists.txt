@@ -94,6 +94,16 @@ list(APPEND kernel_files
 endif()
 
 add_library(kernel ${kernel_files})
+target_link_libraries(kernel c_picolibc)
+target_link_libraries(kernel c_common)
+
+add_library(c INTERFACE IMPORTED GLOBAL)
+add_library(gcc INTERFACE IMPORTED GLOBAL)
+set_property(TARGET c PROPERTY IMPORTED_LIBNAME "c")
+set_property(TARGET gcc PROPERTY IMPORTED_LIBNAME "gcc")
+target_link_libraries(kernel c gcc)
+target_link_libraries(c INTERFACE kernel)
+target_link_libraries(gcc INTERFACE kernel)
 
 # Kernel files has the macro __ZEPHYR_SUPERVISOR__ set so that it
 # optimizes the code when userspace is enabled.
@@ -175,10 +185,6 @@ target_include_directories(kernel PRIVATE
   )
 
 target_link_libraries(kernel zephyr_interface)
-
-# Add any toolchain-specific libraries that the kernel needs to
-# link against. These are set using zephyr_kernel_link_libraries
-target_link_libraries(kernel $<TARGET_PROPERTY:zephyr_interface,KERNEL_LINK_LIBRARIES>)
 
 endif()
 

@@ -591,7 +591,7 @@ set(ZEPHYR_CURRENT_MODULE_DIR)
 set(ZEPHYR_CURRENT_CMAKE_DIR)
 
 get_property(LIBC_LINK_LIBRARIES TARGET zephyr_interface PROPERTY LIBC_LINK_LIBRARIES)
-target_link_libraries(zephyr_interface INTERFACE ${LIBC_LINK_LIBRARIES})
+zephyr_link_libraries(${LIBC_LINK_LIBRARIES})
 
 set(syscall_list_h   ${CMAKE_CURRENT_BINARY_DIR}/include/generated/syscall_list.h)
 set(syscalls_json    ${CMAKE_CURRENT_BINARY_DIR}/misc/generated/syscalls.json)
@@ -867,13 +867,6 @@ endforeach()
 
 # Convenience variable for linkers
 get_property(ZEPHYR_LINK_LIBS_PROPERTY TARGET zephyr_interface PROPERTY LINK_LIBS)
-
-# Remove any non-file options which aren't libraries from this property
-foreach(zephyr_link_lib ${ZEPHYR_LINK_LIBS_PROPERTY})
- if(zephyr_link_lib MATCHES "^-.*" AND NOT zephyr_link_lib MATCHES "^-l.*")
-    list(REMOVE_ITEM ZEPHYR_LINK_LIBS_PROPERTY ${zephyr_link_lib})
-  endif()
-endforeach()
 
 get_property(OUTPUT_FORMAT        GLOBAL PROPERTY PROPERTY_OUTPUT_FORMAT)
 

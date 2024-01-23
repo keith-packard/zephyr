@@ -110,6 +110,11 @@ assert_exists(LIBGCC_DIR)
 LIST(APPEND LIB_INCLUDE_DIR "-L\"${LIBGCC_DIR}\"")
 LIST(APPEND TOOLCHAIN_LIBS gcc)
 
+# We should use built-in CMAKE_C_STANDARD_LIBS (and friends) instead of re-inventing the wheel.
+# This setting should ideally be based upon toolchain coupled with information related to c++ config.
+# Todo: deprecate TOOLCHAIN_LIBS, it appears it tries to achieve what CMAKE_C_STANDARD_LIBRARIES provides.
+set(CMAKE_C_STANDARD_LIBRARIES "-lc -lgcc" CACHE INTERNAL "")
+
 # For CMake to be able to test if a compiler flag is supported by the
 # toolchain we need to give CMake the necessary flags to compile and
 # link a dummy C file.

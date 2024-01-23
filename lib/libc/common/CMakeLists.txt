@@ -4,7 +4,6 @@ zephyr_system_include_directories(include)
 
 add_library(c_common)
 
-zephyr_kernel_link_libraries(c_common)
 target_link_libraries(c_common PRIVATE zephyr_interface kernel)
 
 target_sources_ifdef(CONFIG_COMMON_LIBC_ABORT c_common PRIVATE source/stdlib/abort.c)

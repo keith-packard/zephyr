@@ -109,16 +109,11 @@ endfunction()
 
 # https://cmake.org/cmake/help/latest/command/target_link_libraries.html
 function(zephyr_link_libraries)
-  set_property(TARGET zephyr_interface APPEND PROPERTY LINK_LIBS ${ARGV})
   target_link_libraries(zephyr_interface INTERFACE ${ARGV})
 endfunction()
 
 function(zephyr_libc_link_libraries)
   set_property(TARGET zephyr_interface APPEND PROPERTY LIBC_LINK_LIBRARIES ${ARGV})
-endfunction()
-
-function(zephyr_kernel_link_libraries)
-  set_property(TARGET zephyr_interface APPEND PROPERTY KERNEL_LINK_LIBRARIES ${ARGV})
 endfunction()
 
 # See this file section 3.1. target_cc_option
