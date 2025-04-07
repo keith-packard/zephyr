@@ -152,7 +152,8 @@ endif()
 
 #
 # Support for the LLVM Sanitizer toolchain instrumentation frameworks
-# (supported by current gcc's as well)
+# (supported by current gcc's as well). CONFIG_UBSAN is handled
+# by the top-level CMakeLists.txt as it works on all targets.
 #
 
 if(CONFIG_ASAN)
@@ -161,10 +162,6 @@ endif()
 
 if(CONFIG_MSAN)
   list(APPEND LLVM_SANITIZERS "memory")
-endif()
-
-if(CONFIG_UBSAN)
-  list(APPEND LLVM_SANITIZERS "undefined")
 endif()
 
 if(CONFIG_ASAN_RECOVER)

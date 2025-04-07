@@ -67,12 +67,30 @@ config ASAN_NOP_DLCLOSE
 
 config UBSAN
 	bool "Build with undefined behavior sanitizer"
-	depends on ARCH_POSIX
 	help
-	  Builds Zephyr with Undefined Behavior Sanitizer enabled.
-	  This is currently only supported by boards based on the posix
-	  architecture, and requires a recent-ish compiler with the
-	  ``-fsanitize=undefined`` command line option.
+	  Builds Zephyr with Undefined Behavior Sanitizer enabled.  This
+	  requires a recent-ish compiler with the ``-fsanitize=undefined``
+	  command line option.
+
+choice UBSAN_MODE
+	prompt "Undefined behavior sanitizer mode"
+	default UBSAN_LIBRARY
+
+config UBSAN_LIBRARY
+	bool "Call ubsan routines"
+	depends on ARCH_POSIX || PICOLIBC
+	help
+	  Call ubsan behavior library routines when undefined behavior is
+	  detected at runtime. This is currently only supported by boards
+	  based on the posix architecture or when building with picolibc.
+
+config UBSAN_TRAP
+	bool "Call __builtin_trap"
+	help
+	  When undefined behavior is detected, invoke __builtin_trap to
+	  cause an exception to be raised. This can be used on any target.
+
+endchoice
 
 config MSAN
 	bool "Build with memory sanitizer"
