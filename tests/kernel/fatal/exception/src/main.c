@@ -124,6 +124,8 @@ void entry_cpu_exception_extend(void *p1, void *p2, void *p3)
 	 */
 #elif defined(CONFIG_ARC)
 	__asm__ volatile ("swi");
+#elif defined(CONFIG_X86) || defined(CONFIG_X86_64)
+	__asm__ volatile ("ud2");
 #else
 	/* used to create a divide by zero error on X86 and MIPS */
 	volatile int error;
