@@ -351,7 +351,22 @@ ZTEST(atomic, test_threads_access_atomic)
  *
  * @ingroup kernel_common_tests
  */
+
+/*
+ * Because this function is testing undefined behavior, we need
+ * to disable the undefined behavior sanitizer. Do this by
+ * attaching the C library's __disable_sanitizer definition to
+ * the function declaration by overriding the 'inline' word which
+ * will be used there.
+ */
+
+#ifdef __disable_sanitizer
+#undef inline
+#define inline inline __disable_sanitizer
+#endif
+
 ZTEST(atomic, test_atomic_overflow)
+#undef inline
 {
 	/* Check overflow over max signed value */
 	uint64_t overflowed_value = (uint64_t)1 << (ATOMIC_BITS - 1);
