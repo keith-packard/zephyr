@@ -196,7 +196,7 @@ __no_optimization void blow_up_stack(void)
 TOOLCHAIN_DISABLE_WARNING(TOOLCHAIN_WARNING_PRAGMAS)
 TOOLCHAIN_DISABLE_WARNING(TOOLCHAIN_WARNING_INFINITE_RECURSION)
 
-__no_optimization int stack_smasher(int val)
+__no_optimization unsigned int stack_smasher(unsigned int val)
 {
 	return stack_smasher(val * 2) + stack_smasher(val * 3);
 }
