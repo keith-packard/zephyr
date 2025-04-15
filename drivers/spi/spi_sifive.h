@@ -59,8 +59,8 @@
 
 #define SF_FMT_PROTO_SINGLE	0
 
-#define SF_TXDATA_FULL  (1 << 31)
-#define SF_RXDATA_EMPTY (1 << 31)
+#define SF_TXDATA_FULL  ((uint32_t) 1 << 31)
+#define SF_RXDATA_EMPTY ((uint32_t) 1 << 31)
 
 /* Structure Declarations */
 

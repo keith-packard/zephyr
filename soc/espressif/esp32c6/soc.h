@@ -21,7 +21,7 @@
 #define SOC_MCAUSE_USER_ECALL_EXP 8 /* User ECALL instruction */
 
 /* Interrupt Mask */
-#define SOC_MCAUSE_IRQ_MASK (1 << 31)
+#define SOC_MCAUSE_IRQ_MASK ((uint32_t) 1 << 31)
 /* Exception code Mask */
 #define SOC_MCAUSE_EXP_MASK 0x7FFFFFFF
 

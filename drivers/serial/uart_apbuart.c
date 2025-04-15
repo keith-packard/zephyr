@@ -94,7 +94,7 @@ struct apbuart_regs {
 /* APBUART register bits. */
 
 /* Control register */
-#define APBUART_CTRL_FA         (1 << 31)
+#define APBUART_CTRL_FA         ((uint32_t) 1 << 31)
 #define APBUART_CTRL_DB         (1 << 11)
 #define APBUART_CTRL_RF         (1 << 10)
 #define APBUART_CTRL_TF         (1 <<  9)

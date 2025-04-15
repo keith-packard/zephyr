@@ -10,7 +10,7 @@
 /* FS26 SPI Tx frame fields */
 
 /* Main or Fail-safe register selection (M/FS) */
-#define FS26_M_FS                            (0x1 << 31)
+#define FS26_M_FS                            ((uint32_t) 0x1 << 31)
 /* Register Address + M/FS */
 #define FS26_REG_ADDR_SHIFT                  (25)
 #define FS26_REG_ADDR_MASK                   (0x7f << FS26_REG_ADDR_SHIFT)
@@ -26,7 +26,7 @@
 #define FS26_DEV_STATUS_MASK                 (0xff << FS26_DEV_STATUS_SHIFT)
 #define FS26_GET_DEV_STATUS(n)               (((n) << FS26_DEV_STATUS_SHIFT) & FS26_DEV_STATUS_MASK)
 /* Main State machine availability (M_AVAL) */
-#define FS26_M_AVAL                          (0x1 << 31)
+#define FS26_M_AVAL                          ((uint32_t) 0x1 << 31)
 /* Fail Safe State machine status (FS_EN) */
 #define FS26_FS_EN                           (0x1 << 30)
 /* Interrupt notification from the Fail-Safe domain */

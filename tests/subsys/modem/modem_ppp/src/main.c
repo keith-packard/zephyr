@@ -149,7 +149,7 @@ static uint8_t test_modem_ppp_prng_random(bool reset)
 		prng_state = 1234;
 	}
 
-	prng_state = (1103515245 * prng_state + 12345) % (1 << 31);
+	prng_state = (1103515245 * prng_state + 12345) % ((uint32_t) 1 << 31);
 	return (uint8_t)(prng_state & 0xFF);
 }
 

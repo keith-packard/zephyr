@@ -17,10 +17,10 @@
 #include <soc.h>
 #include <zephyr/irq.h>
 
-#define RXDATA_EMPTY   (1 << 31)   /* Receive FIFO Empty */
+#define RXDATA_EMPTY   ((uint32_t) 1 << 31)   /* Receive FIFO Empty */
 #define RXDATA_MASK    0xFF        /* Receive Data Mask */
 
-#define TXDATA_FULL    (1 << 31)   /* Transmit FIFO Full */
+#define TXDATA_FULL    ((uint32_t) 1 << 31)   /* Transmit FIFO Full */
 
 #define TXCTRL_TXEN    (1 << 0)    /* Activate Tx Channel */
 

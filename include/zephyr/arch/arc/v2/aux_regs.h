@@ -206,7 +206,7 @@
 #define _ARC_V2_STATUS32_US (1 << _ARC_V2_STATUS32_US_BIT)
 #define _ARC_V2_STATUS32_S_BIT 21
 #define _ARC_V2_STATUS32_S (1 << _ARC_V2_STATUS32_US_BIT)
-#define _ARC_V2_STATUS32_IE (1 << 31)
+#define _ARC_V2_STATUS32_IE ((uint32_t) 1 << 31)
 
 /* SEC_STAT bits */
 #define _ARC_V2_SEC_STAT_SSC_BIT 0
