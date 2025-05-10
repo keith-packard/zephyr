@@ -43,9 +43,14 @@ target_include_directories(boot_stage2 PUBLIC
   ${ZEPHYR_BASE}/include
   )
 
+set(nosys_specs)
+if(CONFIG_NEWLIB_LIBC)
+  set(nosys_specs "--specs=nosys.specs")
+endif()
+
 target_link_options(boot_stage2 PRIVATE
   "-nostartfiles"
-  "--specs=nosys.specs"
+  ${nosys_specs}
   "LINKER:--script=${boot_stage_dir}/boot_stage2.ld"
   )
 
