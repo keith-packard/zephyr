@@ -13,7 +13,10 @@ set(WIFI_NM_WPA_SUPPLICANT_BASE ${HOSTAP_BASE}/wpa_supplicant)
 set(HOSTAP_SRC_BASE ${HOSTAP_BASE}/src)
 set(WIFI_NM_HOSTAPD_BASE ${HOSTAP_BASE}/hostapd)
 
-set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs -lnosys")
+set(CMAKE_EXE_LINKER_FLAGS)
+if(CONFIG_NEWLIB_LIBC)
+  set(CMAKE_EXE_LINKER_FLAGS "--specs=nosys.specs -lnosys")
+endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMISSING_SYSCALL_NAMES")
 
 zephyr_include_directories(
