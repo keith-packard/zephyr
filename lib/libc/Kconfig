@@ -51,6 +51,11 @@ config PICOLIBC_SUPPORTED
 	help
 	  Selected when the target has support for picolibc.
 
+config PICOLIBC_DEFAULT
+	bool
+	help
+	  Selected when the target uses picolibc by default
+
 config IAR_LIBC_SUPPORTED
 	bool
 	default n
