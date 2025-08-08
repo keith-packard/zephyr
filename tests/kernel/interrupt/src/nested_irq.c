@@ -113,8 +113,10 @@ void isr1(const void *param)
 void isr0(const void *param)
 {
 	ARG_UNUSED(param);
+	volatile float one = 1.0;
+	volatile float two = 2.0;
 
-	printk("isr0: Enter\n");
+	printk("isr0: Enter %d\n", (int) (two * one));
 
 	/* Set verification token */
 	isr0_result = ISR0_TOKEN;
